@@ -5,24 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Agendamiento de Mensajes</title>
     <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #brigada-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around; 
+            margin-bottom: 20px;
+        }
+
+        .brigada-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            width: calc(50% - 20px); /* Dos brigadas por fila en pantallas grandes */
+        }
+
+        @media (max-width: 768px) { 
+            .brigada-container {
+                width: 100%; 
+            }
+        }
+
+        .brigada-1 { border-left: 5px solid #a6dcef; }
+        .brigada-2 { border-left: 5px solid #f7bdbd; }
+        .brigada-3 { border-left: 5px solid #fff5cc; }
+        .brigada-4 { border-left: 5px solid #e0e0f8; }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-top: 10px; 
         }
+
         th, td {
-            border: 1px solid #000;
+            border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
         }
-        button {
-            padding: 5px 10px;
-            margin: 2px;
+
+        th {
+            background-color: #f0f0f0;
         }
-        .brigada-1 { background-color: #f0f8ff; }
-        .brigada-2 { background-color: #ffe4e1; }
-        .brigada-3 { background-color: #fafad2; }
-        .brigada-4 { background-color: #e6e6fa; }
+
+        input[type="text"], input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px; 
+        }
+
+        button:hover {
+            background-color: #3e8e41;
+        }
+
+        button:last-child { /* Eliminar margen derecho del último botón */
+            margin-right: 0;
+        }
+
+        .delete-button {
+            background-color: #f44336; 
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f; 
+        }
     </style>
 </head>
 <body>
@@ -33,8 +102,10 @@
     <!-- Aquí se agregarán las brigadas dinámicamente -->
 </div>
 
-<button onclick="agregarBrigada()">Agregar Brigada</button>
-<button onclick="limpiarTabla()">Limpiar Todo</button>
+<div style="text-align: center;">
+    <button onclick="agregarBrigada()">Agregar Brigada</button>
+    <button onclick="limpiarTabla()">Limpiar Todo</button>
+</div>
 
 <script>
 let brigadaCount = 0;
