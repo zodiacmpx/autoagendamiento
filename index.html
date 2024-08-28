@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Agendamiento de Mensajes</title>
     <style>
-        /* Estilos básicos para la tabla */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -20,11 +19,10 @@
             padding: 5px 10px;
             margin: 2px;
         }
-        /* Diferentes colores para las brigadas */
-        .brigada-1 { background-color: #f0f8ff; } /* Brigada color azul claro */
-        .brigada-2 { background-color: #ffe4e1; } /* Brigada color rosa claro */
-        .brigada-3 { background-color: #fafad2; } /* Brigada color amarillo claro */
-        .brigada-4 { background-color: #e6e6fa; } /* Brigada color lavanda */
+        .brigada-1 { background-color: #f0f8ff; }
+        .brigada-2 { background-color: #ffe4e1; }
+        .brigada-3 { background-color: #fafad2; }
+        .brigada-4 { background-color: #e6e6fa; }
     </style>
 </head>
 <body>
@@ -48,7 +46,12 @@ function agregarBrigada() {
     
     // Crear un nuevo contenedor para la brigada
     const brigadaDiv = document.createElement('div');
-    brigadaDiv.className = `brigada-${brigadaCount % 4 + 1}`; // Rotación de colores
+    brigadaDiv.className = `brigada-${brigadaCount % 4 + 1}`;
+    
+    // Input para el nombre de la brigada
+    const brigadaInput = document.createElement('input');
+    brigadaInput.type = 'text';
+    brigadaInput.placeholder = `Nombre de la Brigada ${brigadaCount}`;
     
     // Crear la tabla para la brigada
     const table = document.createElement('table');
@@ -56,9 +59,10 @@ function agregarBrigada() {
     table.innerHTML = `
         <thead>
             <tr>
-                <th>Brigada ${brigadaCount}</th>
+                <th>Brigada</th>
                 <th>Ticket</th>
                 <th>Teléfono</th>
+                <th>Hora</th>
                 <th>Mensaje Personalizado</th>
                 <th>Acción</th>
             </tr>
@@ -72,85 +76,40 @@ function agregarBrigada() {
     const addRowButton = document.createElement('button');
     addRowButton.innerText = 'Agregar Ticket';
     addRowButton.onclick = function() {
-        agregarFila(table.id);
+        agregarFila(table.id, brigadaInput);
     };
     
-    // Añadir la tabla y el botón al contenedor de la brigada
+    // Añadir la tabla, el input de nombre y el botón al contenedor de la brigada
+    brigadaDiv.appendChild(brigadaInput);
     brigadaDiv.appendChild(table);
     brigadaDiv.appendChild(addRowButton);
     container.appendChild(brigadaDiv);
 }
 
 // Función para agregar una nueva fila a la brigada
-function agregarFila(tableId) {
+function agregarFila(tableId, brigadaInput) {
     const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
     const newRow = table.insertRow();
     
-    // Crear celdas y entradas para Ticket, Teléfono, y Mensaje
+    // Crear celdas y entradas para Ticket, Teléfono, Hora, y Mensaje
     const brigadaCell = newRow.insertCell(0);
     const ticketCell = newRow.insertCell(1);
     const phoneCell = newRow.insertCell(2);
-    const messageCell = newRow.insertCell(3);
-    const actionCell = newRow.insertCell(4);
+    const timeCell = newRow.insertCell(3);
+    const messageCell = newRow.insertCell(4);
+    const actionCell = newRow.insertCell(5);
     
-    brigadaCell.innerHTML = `Brigada ${tableId.split('-')[1]}`;
+    brigadaCell.innerHTML = brigadaInput.value;
     ticketCell.innerHTML = `<input type="text" placeholder="Ticket">`;
     phoneCell.innerHTML = `<input type="text" placeholder="Teléfono">`;
+    timeCell.innerHTML = `<input type="time" placeholder="Hora">`;
     messageCell.innerHTML = `<input type="text" placeholder="Mensaje">`;
     
     // Botones para enviar diferentes mensajes
     const sendButton1 = document.createElement('button');
     sendButton1.innerText = 'Enviar Mensaje 1';
     sendButton1.onclick = function() {
-        enviarMensaje(row, 1);
-    };
-    
-    const sendButton2 = document.createElement('button');
-    sendButton2.innerText = 'Enviar Mensaje 2';
-    sendButton2.onclick = function() {
-        enviarMensaje(row, 2);
-    };
-    
-    const sendButton3 = document.createElement('button');
-    sendButton3.innerText = 'Enviar Mensaje 3';
-    sendButton3.onclick = function() {
-        enviarMensaje(row, 3);
-    };
-
-    // Añadir botones a la celda de acciones
-    actionCell.appendChild(sendButton1);
-    actionCell.appendChild(sendButton2);
-    actionCell.appendChild(sendButton3);
-}
-
-// Función para enviar el mensaje por WhatsApp
-function enviarMensaje(row, tipoMensaje) {
-    const brigada = row.cells[0].textContent;
-    const ticket = row.cells[1].getElementsByTagName('input')[0].value;
-    const telefono = row.cells[2].getElementsByTagName('input')[0].value;
-    const mensajePersonalizado = row.cells[3].getElementsByTagName('input')[0].value;
-    
-    // Mensajes predeterminados
-    let mensaje = '';
-    if (tipoMensaje === 1) {
-        mensaje = `Estimado cliente muy buenas tardes, le habla Franco Díaz desde Despacho de Brigadas comerciales de SAESA, el día de mañana podremos ver la conexión de su ticket ${ticket} a las XX.XX hrs. Favor disponer el acceso para la brigada y todas las facilidades para poder realizar la conexión en esta visita. Saludos cordiales.`;
-    } else if (tipoMensaje === 2) {
-        mensaje = `Hola, este es un mensaje de confirmación para su ticket ${ticket}. Por favor asegúrese de que todo esté listo para la visita de nuestra brigada.`;
-    } else if (tipoMensaje === 3) {
-        mensaje = mensajePersonalizado;
-    }
-    
-    const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
-    
-    window.open(url, '_blank');
-}
-
-// Función para limpiar todas las brigadas y tickets
-function limpiarTabla() {
-    const container = document.getElementById('brigada-container');
-    container.innerHTML = ''; // Elimina todo el contenido del contenedor
-    brigadaCount = 0; // Reinicia el contador de brigadas
-}
+        enviarMensaje(newRow, brigadaInput.value
 
 </script>
 
