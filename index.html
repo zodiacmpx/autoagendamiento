@@ -107,7 +107,9 @@ function agregarFila(tableId, brigadaInput) {
     ticketCell.innerHTML = `<input type="text" placeholder="Ticket">`;
     phoneCell.innerHTML = `<input type="text" placeholder="Teléfono">`;
     timeCell.innerHTML = `<input type="time" placeholder="Hora">`;
-    messageCell1.innerHTML = `<input type="text" placeholder="Mensaje 1">`;
+    
+    // Mensaje 1 predefinido que se rellenará automáticamente
+    messageCell1.innerHTML = `<input type="text" placeholder="Mensaje 1" disabled>`;
     messageCell2.innerHTML = `<input type="text" placeholder="Mensaje 2">`;
     messageCell3.innerHTML = `<input type="text" placeholder="Mensaje 3">`;
     
@@ -115,6 +117,7 @@ function agregarFila(tableId, brigadaInput) {
     const sendButton1 = document.createElement('button');
     sendButton1.innerText = 'Enviar Mensaje 1';
     sendButton1.onclick = function() {
+        rellenarMensajePredeterminado(newRow, brigadaInput.value);
         enviarMensaje(newRow, brigadaInput.value, 1);
     };
     
@@ -130,17 +133,33 @@ function agregarFila(tableId, brigadaInput) {
         enviarMensaje(newRow, brigadaInput.value, 3);
     };
 
+    // Botón para eliminar la fila
+    const deleteButton = document.createElement('button');
+    deleteButton.innerText = 'Eliminar';
+    deleteButton.onclick = function() {
+        eliminarFila(newRow);
+    };
+
     // Añadir botones a la celda de acciones
     actionCell.appendChild(sendButton1);
     actionCell.appendChild(sendButton2);
     actionCell.appendChild(sendButton3);
+    actionCell.appendChild(deleteButton);
+}
+
+// Función para rellenar el mensaje predeterminado
+function rellenarMensajePredeterminado(row, brigada) {
+    const ticket = row.cells[1].getElementsByTagName('input')[0].value;
+    const hora = row.cells[3].getElementsByTagName('input')[0].value;
+
+    const mensajePredeterminado = `Estimado cliente, muy buenas tardes. Le habla Franco Díaz desde Despacho de Brigadas comerciales de SAESA. El día de mañana podremos ver la conexión de su ticket ${ticket} a las ${hora}. Favor disponer el acceso para la brigada y todas las facilidades para poder realizar la conexión en esta visita. Saludos cordiales.`;
+    
+    row.cells[4].getElementsByTagName('input')[0].value = mensajePredeterminado;
 }
 
 // Función para enviar el mensaje por WhatsApp
 function enviarMensaje(row, brigada, tipoMensaje) {
-    const ticket = row.cells[1].getElementsByTagName('input')[0].value;
     const telefono = row.cells[2].getElementsByTagName('input')[0].value;
-    const hora = row.cells[3].getElementsByTagName('input')[0].value;
     const mensajePersonalizado1 = row.cells[4].getElementsByTagName('input')[0].value;
     const mensajePersonalizado2 = row.cells[5].getElementsByTagName('input')[0].value;
     const mensajePersonalizado3 = row.cells[6].getElementsByTagName('input')[0].value;
@@ -148,9 +167,9 @@ function enviarMensaje(row, brigada, tipoMensaje) {
     // Mensajes personalizados
     let mensaje = '';
     if (tipoMensaje === 1) {
-        mensaje = mensajePersonalizado1 || `Estimado cliente, muy buenas tardes. Le habla Franco Díaz desde la brigada ${brigada} de SAESA. El día de mañana podremos ver la conexión de su ticket ${ticket} a las ${hora}. Favor disponer el acceso para la brigada y todas las facilidades para poder realizar la conexión en esta visita. Saludos cordiales.`;
+        mensaje = mensajePersonalizado1;
     } else if (tipoMensaje === 2) {
-        mensaje = mensajePersonalizado2 || `Hola, este es un mensaje de confirmación de la brigada ${brigada} para su ticket ${ticket}. La visita está programada para las ${hora}. Asegúrese de que todo esté listo.`;
+        mensaje = mensajePersonalizado2 || `Hola, este es un mensaje de confirmación de la brigada ${brigada}. La visita está programada. Asegúrese de que todo esté listo.`;
     } else if (tipoMensaje === 3) {
         mensaje = mensajePersonalizado3 || 'Mensaje personalizado 3 no especificado.';
     }
@@ -158,6 +177,12 @@ function enviarMensaje(row, brigada, tipoMensaje) {
     const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
     
     window.open(url, '_blank');
+}
+
+// Función para eliminar una fila
+function eliminarFila(row) {
+    const table = row.parentNode;
+    table.removeChild(row);
 }
 
 // Función para limpiar todas las brigadas y tickets
