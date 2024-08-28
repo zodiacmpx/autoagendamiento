@@ -5,17 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Agendamiento de Mensajes</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .brigada-container {
-            margin-bottom: 20px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -29,27 +18,18 @@
         button {
             padding: 5px 10px;
             margin: 2px;
-            cursor: pointer;
         }
         .brigada-1 { background-color: #f0f8ff; }
         .brigada-2 { background-color: #ffe4e1; }
         .brigada-3 { background-color: #fafad2; }
         .brigada-4 { background-color: #e6e6fa; }
-        @media (max-width: 600px) {
-            table {
-                font-size: 12px;
-            }
-            th, td {
-                padding: 5px;
-            }
-        }
     </style>
 </head>
 <body>
 
 <h1>Sistema de Agendamiento de Mensajes</h1>
 
-<div id="brigada-container" class="brigada-container">
+<div id="brigada-container">
     <!-- Aquí se agregarán las brigadas dinámicamente -->
 </div>
 
@@ -57,96 +37,160 @@
 <button onclick="limpiarTabla()">Limpiar Todo</button>
 
 <script>
-    let brigadaCount = 0;
+let brigadaCount = 0;
 
-    function agregarBrigada() {
-        brigadaCount++;
-        const container = document.getElementById('brigada-container');
+// Función para agregar una nueva brigada
+function agregarBrigada() {
+    brigadaCount++;
+    const container = document.getElementById('brigada-container');
+    
+    // Crear un nuevo contenedor para la brigada
+    const brigadaDiv = document.createElement('div');
+    brigadaDiv.className = `brigada-${brigadaCount % 4 + 1}`;
+    
+    // Input para el nombre de la brigada
+    const brigadaInput = document.createElement('input');
+    brigadaInput.type = 'text';
+    brigadaInput.placeholder = `Nombre de la Brigada ${brigadaCount}`;
+    
+    // Crear la tabla para la brigada
+    const table = document.createElement('table');
+    table.id = `brigada-${brigadaCount}`;
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Brigada</th>
+                <th>Ticket</th>
+                <th>Teléfono</th>
+                <th>Hora</th>
+                <th>Mensaje Personalizado 1</th>
+                <th>Mensaje Personalizado 2</th>
+                <th>Mensaje Personalizado 3</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se agregarán las filas dinámicamente -->
+        </tbody>
+    `;
+    
+    // Botón para agregar fila en esta brigada
+    const addRowButton = document.createElement('button');
+    addRowButton.innerText = 'Agregar Ticket';
+    addRowButton.onclick = function() {
+        agregarFila(table.id, brigadaInput);
+    };
+    
+    // Añadir la tabla, el input de nombre y el botón al contenedor de la brigada
+    brigadaDiv.appendChild(brigadaInput);
+    brigadaDiv.appendChild(table);
+    brigadaDiv.appendChild(addRowButton);
+    container.appendChild(brigadaDiv);
+}
 
-        const brigadaDiv = document.createElement('div');
-        brigadaDiv.className = `brigada-${brigadaCount % 4 + 1}`;
+// Función para agregar una nueva fila a la brigada
+function agregarFila(tableId, brigadaInput) {
+    const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    
+    // Crear celdas y entradas para Ticket, Teléfono, Hora, y Mensajes Personalizados
+    const brigadaCell = newRow.insertCell(0);
+    const ticketCell = newRow.insertCell(1);
+    const phoneCell = newRow.insertCell(2);
+    const timeCell = newRow.insertCell(3);
+    const messageCell1 = newRow.insertCell(4);
+    const messageCell2 = newRow.insertCell(5);
+    const messageCell3 = newRow.insertCell(6);
+    const actionCell = newRow.insertCell(7);
+    
+    brigadaCell.innerHTML = brigadaInput.value;
+    ticketCell.innerHTML = `<input type="text" placeholder="Ticket">`;
+    phoneCell.innerHTML = `<input type="text" placeholder="Teléfono">`;
+    timeCell.innerHTML = `<input type="time" placeholder="Hora">`;
+    
+    // Mensaje 1 predefinido que se rellenará automáticamente
+    messageCell1.innerHTML = `<input type="text" placeholder="Mensaje 1" disabled>`;
+    messageCell2.innerHTML = `<input type="text" placeholder="Mensaje 2">`;
+    messageCell3.innerHTML = `<input type="text" placeholder="Mensaje 3">`;
+    
+    // Botones para enviar diferentes mensajes
+    const sendButton1 = document.createElement('button');
+    sendButton1.innerText = 'Enviar Mensaje 1';
+    sendButton1.onclick = function() {
+        rellenarMensajePredeterminado(newRow, brigadaInput.value);
+        enviarMensaje(newRow, brigadaInput.value, 1);
+    };
+    
+    const sendButton2 = document.createElement('button');
+    sendButton2.innerText = 'Enviar Mensaje 2';
+    sendButton2.onclick = function() {
+        enviarMensaje(newRow, brigadaInput.value, 2);
+    };
+    
+    const sendButton3 = document.createElement('button');
+    sendButton3.innerText = 'Enviar Mensaje 3';
+    sendButton3.onclick = function() {
+        enviarMensaje(newRow, brigadaInput.value, 3);
+    };
 
-        const brigadaInput = document.createElement('input');
-        brigadaInput.type = 'text';
-        brigadaInput.placeholder = `Nombre de la Brigada ${brigadaCount}`;
-        brigadaInput.setAttribute('aria-label', `Nombre de la Brigada ${brigadaCount}`);
+    // Botón para eliminar la fila
+    const deleteButton = document.createElement('button');
+    deleteButton.innerText = 'Eliminar';
+    deleteButton.onclick = function() {
+        eliminarFila(newRow);
+    };
 
-        const table = document.createElement('table');
-        table.id = `brigada-${brigadaCount}`;
-        table.innerHTML = `
-            <thead>
-                <tr>
-                    <th>Brigada</th>
-                    <th>Ticket</th>
-                    <th>Teléfono</th>
-                    <th>Hora</th>
-                    <th>Mensaje Personalizado 1</th>
-                    <th>Mensaje Personalizado 2</th>
-                    <th>Mensaje Personalizado 3</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        `;
+    // Añadir botones a la celda de acciones
+    actionCell.appendChild(sendButton1);
+    actionCell.appendChild(sendButton2);
+    actionCell.appendChild(sendButton3);
+    actionCell.appendChild(deleteButton);
+}
 
-        const addRowButton = document.createElement('button');
-        addRowButton.innerText = 'Agregar Ticket';
-        addRowButton.setAttribute('role', 'button');
-        addRowButton.onclick = function() {
-            agregarFila(table.id, brigadaInput);
-        };
+// Función para rellenar el mensaje predeterminado
+function rellenarMensajePredeterminado(row, brigada) {
+    const ticket = row.cells[1].getElementsByTagName('input')[0].value;
+    const hora = row.cells[3].getElementsByTagName('input')[0].value;
 
-        brigadaDiv.appendChild(brigadaInput);
-        brigadaDiv.appendChild(table);
-        brigadaDiv.appendChild(addRowButton);
-        container.appendChild(brigadaDiv);
+    const mensajePredeterminado = `Estimado cliente, muy buenas tardes. Le habla Franco Díaz desde Despacho de Brigadas comerciales de SAESA. El día de mañana podremos ver la conexión de su ticket ${ticket} a las ${hora}. Favor disponer el acceso para la brigada y todas las facilidades para poder realizar la conexión en esta visita. Saludos cordiales.`;
+    
+    row.cells[4].getElementsByTagName('input')[0].value = mensajePredeterminado;
+}
+
+// Función para enviar el mensaje por WhatsApp
+function enviarMensaje(row, brigada, tipoMensaje) {
+    const telefono = row.cells[2].getElementsByTagName('input')[0].value;
+    const mensajePersonalizado1 = row.cells[4].getElementsByTagName('input')[0].value;
+    const mensajePersonalizado2 = row.cells[5].getElementsByTagName('input')[0].value;
+    const mensajePersonalizado3 = row.cells[6].getElementsByTagName('input')[0].value;
+    
+    // Mensajes personalizados
+    let mensaje = '';
+    if (tipoMensaje === 1) {
+        mensaje = mensajePersonalizado1;
+    } else if (tipoMensaje === 2) {
+        mensaje = mensajePersonalizado2 || `Hola, este es un mensaje de confirmación de la brigada ${brigada}. La visita está programada. Asegúrese de que todo esté listo.`;
+    } else if (tipoMensaje === 3) {
+        mensaje = mensajePersonalizado3 || 'Mensaje personalizado 3 no especificado.';
     }
+    
+    const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
+    
+    window.open(url, '_blank');
+}
 
-    function agregarFila(tableId, brigadaInput) {
-        const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
+// Función para eliminar una fila
+function eliminarFila(row) {
+    const table = row.parentNode;
+    table.removeChild(row);
+}
 
-        newRow.innerHTML = `
-            <td>${brigadaInput.value}</td>
-            <td><input type="text" placeholder="Ticket" aria-label="Ticket"></td>
-            <td><input type="text" placeholder="Teléfono" aria-label="Teléfono"></td>
-            <td><input type="time" placeholder="Hora" aria-label="Hora"></td>
-            <td><input type="text" placeholder="Mensaje 1" disabled aria-label="Mensaje 1"></td>
-            <td><input type="text" placeholder="Mensaje 2" aria-label="Mensaje 2"></td>
-            <td><input type="text" placeholder="Mensaje 3" aria-label="Mensaje 3"></td>
-            <td>
-                <button onclick="enviarMensaje(this, 1)">Enviar Mensaje 1</button>
-                <button onclick="enviarMensaje(this, 2)">Enviar Mensaje 2</button>
-                <button onclick="enviarMensaje(this, 3)">Enviar Mensaje 3</button>
-                <button onclick="eliminarFila(this)">Eliminar</button>
-            </td>
-        `;
-    }
-
-    function enviarMensaje(button, tipoMensaje) {
-        const row = button.closest('tr');
-        const telefono = row.cells[2].getElementsByTagName('input')[0].value;
-        const mensajes = [
-            row.cells[4].getElementsByTagName('input')[0].value,
-            row.cells[5].getElementsByTagName('input')[0].value || `Mensaje de confirmación de la brigada.`,
-            row.cells[6].getElementsByTagName('input')[0].value || 'Mensaje personalizado 3 no especificado.'
-        ];
-        const mensaje = mensajes[tipoMensaje - 1];
-        const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
-    }
-
-    function eliminarFila(button) {
-        const row = button.closest('tr');
-        row.parentNode.removeChild(row);
-    }
-
-    function limpiarTabla() {
-        const container = document.getElementById('brigada-container');
-        container.innerHTML = '';
-        brigadaCount = 0;
-    }
+// Función para limpiar todas las brigadas y tickets
+function limpiarTabla() {
+    const container = document.getElementById('brigada-container');
+    container.innerHTML = ''; // Elimina todo el contenido del contenedor
+    brigadaCount = 0; // Reinicia el contador de brigadas
+}
 </script>
 
 </body>
