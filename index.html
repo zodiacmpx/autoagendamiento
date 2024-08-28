@@ -61,7 +61,8 @@ function agregarBrigada() {
             <tr>
                 <th>Brigada</th>
                 <th>Ticket</th>
-                <th>Teléfono</th>
+                <th>Teléfono 1</th>
+                <th>Teléfono 2</th>
                 <th>Hora</th>
                 <th>Mensaje Personalizado 1</th>
                 <th>Mensaje Personalizado 2</th>
@@ -93,19 +94,21 @@ function agregarFila(tableId, brigadaInput) {
     const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
     const newRow = table.insertRow();
     
-    // Crear celdas y entradas para Ticket, Teléfono, Hora, y Mensajes Personalizados
+    // Crear celdas y entradas para Ticket, Teléfonos, Hora, y Mensajes Personalizados
     const brigadaCell = newRow.insertCell(0);
     const ticketCell = newRow.insertCell(1);
-    const phoneCell = newRow.insertCell(2);
-    const timeCell = newRow.insertCell(3);
-    const messageCell1 = newRow.insertCell(4);
-    const messageCell2 = newRow.insertCell(5);
-    const messageCell3 = newRow.insertCell(6);
-    const actionCell = newRow.insertCell(7);
+    const phoneCell1 = newRow.insertCell(2);
+    const phoneCell2 = newRow.insertCell(3);
+    const timeCell = newRow.insertCell(4);
+    const messageCell1 = newRow.insertCell(5);
+    const messageCell2 = newRow.insertCell(6);
+    const messageCell3 = newRow.insertCell(7);
+    const actionCell = newRow.insertCell(8);
     
     brigadaCell.innerHTML = brigadaInput.value;
     ticketCell.innerHTML = `<input type="text" placeholder="Ticket">`;
-    phoneCell.innerHTML = `<input type="text" placeholder="Teléfono">`;
+    phoneCell1.innerHTML = `<input type="text" placeholder="Teléfono 1">`;
+    phoneCell2.innerHTML = `<input type="text" placeholder="Teléfono 2">`;
     timeCell.innerHTML = `<input type="time" placeholder="Hora">`;
     
     // Mensaje 1 predefinido que se rellenará automáticamente
@@ -150,19 +153,20 @@ function agregarFila(tableId, brigadaInput) {
 // Función para rellenar el mensaje predeterminado
 function rellenarMensajePredeterminado(row, brigada) {
     const ticket = row.cells[1].getElementsByTagName('input')[0].value;
-    const hora = row.cells[3].getElementsByTagName('input')[0].value;
+    const hora = row.cells[4].getElementsByTagName('input')[0].value;
 
     const mensajePredeterminado = `Estimado cliente, muy buenas tardes. Le habla Franco Díaz desde Despacho de Brigadas comerciales de SAESA. El día de mañana podremos ver la conexión de su ticket ${ticket} a las ${hora}. Favor disponer el acceso para la brigada y todas las facilidades para poder realizar la conexión en esta visita. Saludos cordiales.`;
     
-    row.cells[4].getElementsByTagName('input')[0].value = mensajePredeterminado;
+    row.cells[5].getElementsByTagName('input')[0].value = mensajePredeterminado;
 }
 
 // Función para enviar el mensaje por WhatsApp
 function enviarMensaje(row, brigada, tipoMensaje) {
-    const telefono = row.cells[2].getElementsByTagName('input')[0].value;
-    const mensajePersonalizado1 = row.cells[4].getElementsByTagName('input')[0].value;
-    const mensajePersonalizado2 = row.cells[5].getElementsByTagName('input')[0].value;
-    const mensajePersonalizado3 = row.cells[6].getElementsByTagName('input')[0].value;
+    const telefono1 = row.cells[2].getElementsByTagName('input')[0].value;
+    const telefono2 = row.cells[3].getElementsByTagName('input')[0].value;
+    const mensajePersonalizado1 = row.cells[5].getElementsByTagName('input')[0].value;
+    const mensajePersonalizado2 = row.cells[6].getElementsByTagName('input')[0].value;
+    const mensajePersonalizado3 = row.cells[7].getElementsByTagName('input')[0].value;
     
     // Mensajes personalizados
     let mensaje = '';
@@ -174,9 +178,15 @@ function enviarMensaje(row, brigada, tipoMensaje) {
         mensaje = mensajePersonalizado3 || 'Mensaje personalizado 3 no especificado.';
     }
     
-    const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
-    
-    window.open(url, '_blank');
+    // Enviar a ambos teléfonos
+    if (telefono1) {
+        const url1 = `https://api.whatsapp.com/send?phone=${telefono1}&text=${encodeURIComponent(mensaje)}`;
+        window.open(url1, '_blank');
+    }
+    if (telefono2) {
+        const url2 = `https://api.whatsapp.com/send?phone=${telefono2}&text=${encodeURIComponent(mensaje)}`;
+        window.open(url2, '_blank');
+    }
 }
 
 // Función para eliminar una fila
