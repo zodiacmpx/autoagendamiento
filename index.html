@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Agendamiento de Mensajes</title>
+    <style>
+        /* Estilos básicos para la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+        }
+        button {
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Sistema de Agendamiento de Mensajes</h1>
+<table id="agenda-table">
+    <thead>
+        <tr>
+            <th>Brigada</th>
+            <th>Ticket</th>
+            <th>Teléfono</th>
+            <th>Mensaje</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Aquí se agregarán las filas dinámicamente -->
+    </tbody>
+</table>
+<br>
+<button onclick="agregarFila()">Agregar Fila</button>
+
+<script>
+function agregarFila() {
+    const table = document.getElementById('agenda-table').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    
+    // Crear celdas y entradas para Brigada, Ticket, Teléfono, y Mensaje
+    const brigadaCell = newRow.insertCell(0);
+    const ticketCell = newRow.insertCell(1);
+    const phoneCell = newRow.insertCell(2);
+    const messageCell = newRow.insertCell(3);
+    const actionCell = newRow.insertCell(4);
+    
+    brigadaCell.innerHTML = `<input type="text" placeholder="Brigada">`;
+    ticketCell.innerHTML = `<input type="text" placeholder="Ticket">`;
+    phoneCell.innerHTML = `<input type="text" placeholder="Teléfono">`;
+    messageCell.innerHTML = `<input type="text" placeholder="Mensaje">`;
+    
+    // Botón para enviar mensaje por WhatsApp
+    const sendButton = document.createElement('button');
+    sendButton.innerText = 'Enviar';
+    sendButton.onclick = function() {
+        enviarMensaje(newRow);
+    };
+    actionCell.appendChild(sendButton);
+}
+
+// Función para enviar el mensaje por WhatsApp
+function enviarMensaje(row) {
+    const brigada = row.cells[0].getElementsByTagName('input')[0].value;
+    const ticket = row.cells[1].getElementsByTagName('input')[0].value;
+    const telefono = row.cells[2].getElementsByTagName('input')[0].value;
+    const mensaje = row.cells[3].getElementsByTagName('input')[0].value;
+
+    const url = `https://api.whatsapp.com/send?phone=${telefono}&text=Hola%20de%20la%20brigada%20${brigada},%20su%20ticket%20${ticket}%20dice:%20${mensaje}`;
+    
+    window.open(url, '_blank');
+}
+</script>
+
+</body>
+</html>
